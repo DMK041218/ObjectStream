@@ -1,0 +1,25 @@
+__pycache__/
+*.py[cod]
+*.pyo
+.DS_Store
+.venv/
+.venv_*/
+.env
+*.log
+
+# datasets / outputs / generated artifacts
+data/
+datasets/
+checkpoints/
+models_cache/
+eval_results/
+outputs/
+output/
+figures/
+tmp/
+*.pdf
+*.png
+*.jpg
+*.jpeg
+*.mp4
+*.jsonl
