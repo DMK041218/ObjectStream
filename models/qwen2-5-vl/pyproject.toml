@@ -1,0 +1,19 @@
+[project]
+name = "qwen2-5-vl-objectstream"
+version = "0.1.0"
+description = "ObjectStream-patched Qwen2.5-VL inference backend"
+requires-python = ">=3.10,<3.12"
+dependencies = [
+    "torch==2.6.0",
+    "torchvision==0.21.0",
+    "transformers==4.50.0",
+    "accelerate==1.4.0",
+    "triton==3.2.0; platform_system == 'Linux'",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build]
+packages = ["src/qwen2_5_vl_objectstream"]

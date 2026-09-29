@@ -83,9 +83,16 @@ def run_qwen25vl_objectstream(
         max_new_tokens=qwen_config.max_new_tokens,
         do_sample=False,
         temperature=0.0,
+        # ObjectStream is implemented by the entity-centric memory path in the
+        # patched Qwen2.5-VL backend.
         use_objectstream=qwen_config.use_objectstream,
         short_frames=qwen_config.short_frames,
         medium_frames=qwen_config.medium_frames,
+        entity_tokens_per_entity=entity_config.tokens_per_entity,
+        entity_max_entities=entity_config.max_entities,
+        entity_saliency_quantile=entity_config.saliency_quantile,
+        entity_match_threshold=entity_config.entity_match_threshold,
+        entity_ema_decay=entity_config.ema_decay,
     )
     trimmed = [
         out_ids[len(in_ids) :] for in_ids, out_ids in zip(inputs.input_ids, generated_ids)

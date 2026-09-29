@@ -22,10 +22,6 @@ from tqdm import tqdm
 sys.path.append(osp.abspath(osp.join(osp.dirname(__file__), '..')))
 from qwen_vl_utils_objectstream import process_vision_info
 from qwen2_5_vl_objectstream import Qwen2_5_VLForConditionalGeneration, Qwen2_5_VLProcessor
-try:
-    from evaluation.llava_onevision_entitymem import LlavaOnevisionEntityMemGenerator
-except ModuleNotFoundError:
-    from llava_onevision_entitymem import LlavaOnevisionEntityMemGenerator
 
 # Parameters
 RUN_NAME = "OVO-Bench"
@@ -656,25 +652,17 @@ def run_single(args):
 
     torch.manual_seed(1234)
     logger.info("Set manual seed to 1234")
-    if args.model_backend == "llava_onevision_entitymem":
-        model = LlavaOnevisionEntityMemGenerator(
-            CKPT_PATH,
-            min_pixels=MIN_PIXELS,
-            max_pixels=MAX_PIXELS,
-        )
-        processor = model.processor
-    else:
-        model = Qwen2_5_VLForConditionalGeneration.from_pretrained(
-            CKPT_PATH,
-            torch_dtype=torch.bfloat16,
-            attn_implementation="flash_attention_2",
-            device_map="auto",
-        )
-        processor = Qwen2_5_VLProcessor.from_pretrained(
-            CKPT_PATH,
-            min_pixels=MIN_PIXELS,
-            max_pixels=MAX_PIXELS,
-        )
+    model = Qwen2_5_VLForConditionalGeneration.from_pretrained(
+        CKPT_PATH,
+        torch_dtype=torch.bfloat16,
+        attn_implementation="flash_attention_2",
+        device_map="auto",
+    )
+    processor = Qwen2_5_VLProcessor.from_pretrained(
+        CKPT_PATH,
+        min_pixels=MIN_PIXELS,
+        max_pixels=MAX_PIXELS,
+    )
 
     original_tokenizer_max_len = processor.tokenizer.model_max_length
     processor.tokenizer.model_max_length = 32768
@@ -1058,7 +1046,7 @@ def build_parser():
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "--model_backend",
-        choices=["qwen25vl_objectstream", "llava_onevision_entitymem"],
+        choices=["qwen25vl_objectstream"],
         default="qwen25vl_objectstream",
         help="Model backend to use for online evaluation",
     )

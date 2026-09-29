@@ -1,0 +1,18 @@
+# Install PyTorch separately with the CUDA command documented in README.md.
+accelerate==1.4.0
+av==14.2.0
+decord==0.6.0
+ffmpeg-python==0.2.0
+hatchling==1.27.0
+huggingface-hub==0.29.3
+numpy==1.26.4
+opencv-python-headless==4.11.0.86
+packaging==24.2
+pillow==11.1.0
+requests==2.32.3
+safetensors==0.5.3
+sentencepiece==0.2.0
+tokenizers==0.21.1
+torchcodec==0.2
+transformers==4.50.0
+triton==3.2.0; platform_system == "Linux"

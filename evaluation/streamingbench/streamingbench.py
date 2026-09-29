@@ -32,17 +32,6 @@ try:
 except Exception:
     Qwen2_5_VLForConditionalGeneration = None
     Qwen2_5_VLProcessor = None
-LlavaOnevisionEntityMemGenerator = None
-try:
-    from evaluation.qwen3vl_entitymem import Qwen3VLEntityMemGenerator
-except Exception:
-    try:
-        sys.path.append(str(Path(__file__).resolve().parents[1]))
-        from qwen3vl_entitymem import Qwen3VLEntityMemGenerator
-    except Exception:
-        Qwen3VLEntityMemGenerator = None
-
-
 class StreamingBenchEvaluator:
     """Evaluator for StreamingBench using Qwen2.5-VL-ObjectStream."""
 
@@ -85,33 +74,6 @@ Answer:"""
         backend = getattr(self.args, "model_backend", "qwen25vl_objectstream")
         self.logger.info(f"Loading model backend={backend}: {self.args.ckpt_path}")
         torch.manual_seed(1234)
-        if backend == "llava_onevision_entitymem":
-            if LlavaOnevisionEntityMemGenerator is None:
-                raise ImportError("LlavaOnevisionEntityMemGenerator is unavailable in the current environment.")
-            self.llava_generator = LlavaOnevisionEntityMemGenerator(
-                self.args.ckpt_path,
-                min_pixels=16 * 28 * 28,
-                max_pixels=int(self.args.max_pixels),
-            )
-            self.model = self.llava_generator.model
-            self.processor = self.llava_generator.processor
-            self.logger.info("LLaVA-OneVision EntityMem backend loaded successfully")
-            return
-        if backend == "qwen3vl_entitymem":
-            if Qwen3VLEntityMemGenerator is None:
-                raise ImportError("Qwen3VLEntityMemGenerator is unavailable. Install a transformers build with Qwen3-VL support.")
-            self.qwen3vl_generator = Qwen3VLEntityMemGenerator(
-                self.args.ckpt_path,
-                min_pixels=16 * 28 * 28,
-                max_pixels=int(self.args.max_pixels),
-            )
-            self.llava_generator = None
-            self.model = self.qwen3vl_generator.model
-            self.processor = self.qwen3vl_generator.processor
-            self.logger.info("Qwen3-VL EntityMem backend loaded successfully")
-            return
-        self.llava_generator = None
-        self.qwen3vl_generator = None
         if Qwen2_5_VLForConditionalGeneration is None or Qwen2_5_VLProcessor is None:
             from qwen2_5_vl_objectstream import Qwen2_5_VLForConditionalGeneration as _Qwen2_5_VLForConditionalGeneration
             from qwen2_5_vl_objectstream import Qwen2_5_VLProcessor as _Qwen2_5_VLProcessor
@@ -434,12 +396,6 @@ Answer:"""
             ],
         }]
 
-        backend = getattr(self.args, "model_backend", "qwen25vl_objectstream")
-        if backend == "llava_onevision_entitymem":
-            return self.llava_generator.generate_response(messages, self.args, max_new_tokens=128)
-        if backend == "qwen3vl_entitymem":
-            return self.qwen3vl_generator.generate_response(messages, self.args, max_new_tokens=128)
-
         text = self.processor.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)
         image_inputs, video_inputs, video_kwargs = process_vision_info(messages, return_video_kwargs=True)
 
@@ -604,7 +560,7 @@ def build_argparser():
     parser = argparse.ArgumentParser(description='StreamingBench Evaluation (Qwen2.5-VL-Memory)')
     parser.add_argument(
         "--model_backend",
-        choices=["qwen25vl_objectstream", "llava_onevision_entitymem", "qwen3vl_entitymem"],
+        choices=["qwen25vl_objectstream"],
         default="qwen25vl_objectstream",
         help="Model backend to use for online evaluation",
     )

@@ -1,0 +1,3 @@
+-r evaluation.txt
+pytest==8.3.5
+ruff==0.11.2

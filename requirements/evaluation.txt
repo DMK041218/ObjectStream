@@ -1,0 +1,10 @@
+-r runtime.txt
+datasets==2.16.1
+evaluate==0.4.3
+jsonlines==4.0.0
+loguru==0.7.3
+moviepy==1.0.3
+pandas==2.2.3
+pyyaml==6.0.2
+scikit-learn==1.6.1
+tqdm==4.67.1
