@@ -78,8 +78,7 @@ limits, see [Implementation Notes](docs/IMPLEMENTATION.md).
 | Generation | BF16, SDPA, non-thinking, greedy, up to 128 tokens |
 
 The [configuration summary](configs/qwen35_9b_objectstream.json) documents
-these defaults; it is not a CLI configuration-file loader. Component variants
-are available through `--variant`.
+these defaults; it is not a CLI configuration-file loader.
 
 ## Evaluation
 

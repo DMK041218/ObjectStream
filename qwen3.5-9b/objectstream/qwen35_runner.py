@@ -5,14 +5,14 @@ import math
 
 class Qwen35ObjectStream:
     def __init__(self, model_path='Qwen/Qwen3.5-9B', cards=1, local_files_only=False,
-                 variant='full', mode='objectstream'):
+                 mode='objectstream'):
         if mode not in ('objectstream', 'native'):
             raise ValueError('mode must be objectstream or native')
         import torch
         if torch.cuda.device_count() != cards:
             raise ValueError('Set CUDA_VISIBLE_DEVICES to exactly the requested cards before loading')
         from .backends.qwen35.backend import Backend
-        self.backend = Backend(model_path, cards=cards, variant=variant,
+        self.backend = Backend(model_path, cards=cards,
                                local_files_only=local_files_only)
         self.mode = mode
 

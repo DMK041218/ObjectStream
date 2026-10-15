@@ -1,6 +1,6 @@
 [project]
 name = "qwen2-5-vl-objectstream"
-version = "0.1.0"
+version = "0.1.1"
 description = "ObjectStream-patched Qwen2.5-VL inference backend"
 requires-python = ">=3.10,<3.12"
 dependencies = [

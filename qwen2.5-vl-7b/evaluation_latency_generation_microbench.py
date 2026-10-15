@@ -18,7 +18,7 @@ from transformers import TextIteratorStreamer
 import sys
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from ovo_ablation_work.evaluation.ovobench import backward_tasks, forward_tasks, realtime_tasks  # noqa: E402
+from evaluation.ovobench.ovobench import backward_tasks, forward_tasks, realtime_tasks  # noqa: E402
 from qwen_vl_utils_objectstream import process_vision_info  # noqa: E402
 from qwen2_5_vl_objectstream import Qwen2_5_VLForConditionalGeneration, Qwen2_5_VLProcessor  # noqa: E402
 

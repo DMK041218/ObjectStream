@@ -117,9 +117,8 @@ objectstream/                 # public configuration and inference wrapper
 models/
   qwen2-5-vl/                 # installable ObjectStream-patched Qwen2.5-VL
   qwen-vl-utils/              # installable image/video preprocessing helpers
-ovo_ablation_work/            # OVO-Bench and memory-construction ablations
+evaluation/ovobench/          # OVO-Bench inference and scoring
 evaluation/streamingbench/    # StreamingBench evaluation
-evaluation/ovobench/          # OVO-Bench scoring utility
 requirements/                 # pinned runtime, evaluation, and development deps
 scripts/                      # installation, validation, and inference entry points
 tests/                        # training-free memory unit tests
@@ -137,7 +136,7 @@ python -m pytest tests
 ```
 
 The dry run does not load model weights or videos. Tests cover the packaged
-model and processor imports, evaluation-module imports, and memory helpers.
+model and processor imports, command-line entry points, and memory helpers.
 
 ## Notes
 

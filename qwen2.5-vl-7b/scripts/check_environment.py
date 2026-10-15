@@ -35,7 +35,7 @@ def main() -> None:
     for module in ('objectstream', 'configuration_qwen2_5_vl_objectstream', 'utils',
                    'processing_qwen2_5_vl_objectstream',
                    'modeling_qwen2_5_vl_objectstream', 'entitymem'):
-        require('ovo_ablation_work.models.' + module)
+        require('qwen2_5_vl_objectstream.' + module)
     expected = '4.50.0'
     if transformers.__version__ != expected:
         raise SystemExit(f'[FAIL] Qwen2.5-VL requires transformers=={expected}; use its separate environment')

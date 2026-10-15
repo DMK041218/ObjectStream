@@ -76,7 +76,6 @@ class EntityMem:
         temporal_order_content_scale: float = 0.02,
         query_saliency: bool = False,
         query_saliency_mix: float = 0.35,
-        entity_frontend: str = "spatial_cluster",
     ) -> None:
         self.vision_start_token_id = vision_start_token_id
         self.vision_end_token_id = vision_end_token_id
@@ -123,9 +122,6 @@ class EntityMem:
         self.temporal_order_content_scale = float(temporal_order_content_scale)
         self.query_saliency = bool(query_saliency)
         self.query_saliency_mix = float(query_saliency_mix)
-        self.entity_frontend = str(entity_frontend)
-        self.frontend_video_path: str | None = None
-        self._external_frontend = None
         self.save_path: str | None = None
         self._next_id = 0
 
@@ -922,31 +918,9 @@ class EntityMem:
             entity_times: dict[int, list[int]] = {}
             entity_chunks: dict[int, int] = {}
             entity_rank_stats: dict[int, tuple[int, float]] = {}
-            frontend_latency_s = 0.0
-            frontend_fallback = False
 
             old_frames = frames if short_grids == 0 else (frames[:-short_grids] if len(frames) > short_grids else [])
             recent_frames = set() if short_grids == 0 else set(frames[-short_grids:])
-            external_regions = None
-            if self.entity_frontend in {"dinov2_cluster", "sam_dinov2"}:
-                try:
-                    if self._external_frontend is None:
-                        from .external_entity_frontends import ExternalEntityFrontend
-                        self._external_frontend = ExternalEntityFrontend()
-                    self._external_frontend.configure(self.entity_frontend, device)
-                    external = self._external_frontend.build(
-                        self.entity_frontend,
-                        str(self.frontend_video_path),
-                        len(frames),
-                        grid_hw,
-                        self.match_threshold,
-                    )
-                    external_regions = external.regions
-                    frontend_latency_s = float(external.latency_s)
-                    frontend_fallback = bool(external.fallback)
-                except Exception:
-                    external_regions = None
-                    frontend_fallback = True
 
             chunk_enabled = bool(self.chunk_selection) and int(self.chunk_size_frames) > 0
             chunk_size = max(1, int(self.chunk_size_frames))
@@ -964,41 +938,12 @@ class EntityMem:
                         entity_states = {}
                         active_chunk_id = chunk_id
                 grid = frame_to_grid[frame_id]
-                region_features = []
-                if self.entity_frontend == "patch_topk":
-                    clusters = [[int(x)] for x in idx.detach().cpu().tolist()]
-                elif external_regions is not None and frames.index(frame_id) < len(external_regions):
-                    clusters = []
-                    flat_grid = grid.flatten()
-                    for local_group, feature in external_regions[frames.index(frame_id)]:
-                        cluster = [
-                            int(flat_grid[local].item())
-                            for local in local_group
-                            if 0 <= int(local) < flat_grid.numel() and int(flat_grid[local].item()) >= 0
-                        ]
-                        if cluster:
-                            clusters.append(cluster)
-                            region_features.append(feature)
-                    if not clusters:
-                        clusters = self._connected_components(idx, saliency, height_ids, width_ids, grid, device)
-                        region_features = []
-                        frontend_fallback = True
-                else:
-                    clusters = self._connected_components(idx, saliency, height_ids, width_ids, grid, device)
-                for cluster_pos, cluster in enumerate(clusters):
+                clusters = self._connected_components(idx, saliency, height_ids, width_ids, grid, device)
+                for cluster in clusters:
                     cidx = torch.tensor(cluster, dtype=torch.long)
-                    if self.entity_frontend == "patch_topk":
-                        eid = int((int(height_ids[cidx[0]]) * grid_hw[1] + int(width_ids[cidx[0]])))
-                        feature = None
-                    else:
-                        feature = (
-                            region_features[cluster_pos].to(device)
-                            if cluster_pos < len(region_features)
-                            else self._weighted_mean(hidden_norm[cidx], saliency[cidx])
-                        )
+                    feature = self._weighted_mean(hidden_norm[cidx], saliency[cidx])
                     cluster_saliency = float(saliency[cidx].mean().item())
-                    if self.entity_frontend != "patch_topk":
-                        eid = self._match_or_create(entity_states, feature, cluster_saliency, frame_id)
+                    eid = self._match_or_create(entity_states, feature, cluster_saliency, frame_id)
                     entity_tokens.setdefault(eid, []).extend(cluster)
                     entity_scores.setdefault(eid, []).extend([float(x) for x in saliency[cidx].detach().cpu().tolist()])
                     entity_times.setdefault(eid, []).extend([int(frame_id)] * len(cluster))
@@ -1007,9 +952,6 @@ class EntityMem:
                     st = entity_states.get(eid)
                     if st is not None:
                         entity_rank_stats[eid] = (int(st.persistence), float(st.saliency))
-                    elif self.entity_frontend == "patch_topk":
-                        old_rank = entity_rank_stats.get(eid, (0, 0.0))
-                        entity_rank_stats[eid] = (old_rank[0] + 1, max(old_rank[1], cluster_saliency))
                 self._evict_states(entity_states, frame_id)
 
             # Allocate per-entity token slots. More persistent/salient entities survive eviction first.
@@ -1128,10 +1070,6 @@ class EntityMem:
             records.append({
                 "batch_idx": int(batch_index),
                 "method": "entitymem",
-                "entity_frontend": self.entity_frontend,
-                "entity_frontend_latency_s": frontend_latency_s,
-                "entity_frontend_fallback": frontend_fallback,
-                "entity_frontend_video_path": self.frontend_video_path,
                 "frames": len(frames),
                 "old_frames": len(old_frames),
                 "recent_frames": len(recent_frames),

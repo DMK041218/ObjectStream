@@ -20,7 +20,6 @@ def main():
     p.add_argument('--local_files_only', action='store_true')
     p.add_argument('--cards', type=int, choices=(1, 2), default=1)
     p.add_argument('--mode', choices=('objectstream', 'native'), default='objectstream')
-    p.add_argument('--variant', choices=('full','rvgw','loam','rvgw_loam','loam_octr'), default='full')
     p.add_argument('--dry_run', action='store_true')
     a = p.parse_args()
     if a.manifest:
@@ -36,7 +35,7 @@ def main():
     rows = sorted(rows, key=lambda r:(r['video_path'], float(r['timestamp']), str(r['id'])))
     if a.dry_run:
         print(json.dumps({'dry_run':True, 'queries':len(rows),'first_query':rows[0] if rows else None,
-            'model':a.model_path,'mode':a.mode,'variant':a.variant,
+            'model':a.model_path,'mode':a.mode,
             'recent_frames':8,'medium_frames':256,'max_entities':256,'tokens_per_entity':32,
             'max_new_tokens':128,'sampling':'causal end-anchored1fps; max256 NEW frames per update',
             'note':'No weights, media or GPU loaded.'},indent=2))
@@ -54,7 +53,7 @@ def main():
     torch.set_num_threads(4)
     from objectstream.qwen35_runner import Qwen35ObjectStream
     runner = Qwen35ObjectStream(a.model_path, cards=a.cards, mode=a.mode,
-        variant=a.variant, local_files_only=a.local_files_only)
+        local_files_only=a.local_files_only)
     previous = None
     try:
         for row in rows:

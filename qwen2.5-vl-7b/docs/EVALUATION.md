@@ -14,7 +14,7 @@ radius 1 and 2 tokens per frame. Sampling is 1 fps with at most 256 frames,
 settings differ from the minimal inference example. Select the six tasks:
 
 ```bash
-CUDA_VISIBLE_DEVICES=0 python ovo_ablation_work/evaluation/ovobench.py \
+CUDA_VISIBLE_DEVICES=0 python evaluation/ovobench/ovobench.py \
   --ckpt_path /path/to/Qwen2.5-VL-7B-Instruct \
   --task_json /path/to/OVO-Bench/ovo_bench_new.json --video_dir /path/to/OVO-Bench \
   --result_dir outputs/ovo_qwen25_e64_t8_burst \
@@ -46,7 +46,7 @@ not committed to this repository. Use absolute paths in the commands below.
 Single GPU:
 
 ```bash
-CUDA_VISIBLE_DEVICES=0 python ovo_ablation_work/evaluation/ovobench.py \
+CUDA_VISIBLE_DEVICES=0 python evaluation/ovobench/ovobench.py \
   --ckpt_path /path/to/Qwen2.5-VL-7B-Instruct \
   --task_json /path/to/OVO-Bench/ovo_bench_new.json \
   --video_dir /path/to/OVO-Bench \
@@ -61,7 +61,7 @@ CUDA_VISIBLE_DEVICES=0 python ovo_ablation_work/evaluation/ovobench.py \
 Multi-GPU example:
 
 ```bash
-CUDA_VISIBLE_DEVICES=0,1,2,3 python ovo_ablation_work/evaluation/ovobench.py \
+CUDA_VISIBLE_DEVICES=0,1,2,3 python evaluation/ovobench/ovobench.py \
   --ckpt_path /path/to/Qwen2.5-VL-7B-Instruct \
   --task_json /path/to/OVO-Bench/ovo_bench_new.json \
   --video_dir /path/to/OVO-Bench \

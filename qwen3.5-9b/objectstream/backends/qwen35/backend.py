@@ -17,15 +17,6 @@ from ._sampling import capture_decord_samples
 from ._video import _read_video_decord
 from .entitymem.entitymem import EntityMem
 
-VARIANTS = {
-    'rvgw': (True, False, False),
-    'loam': (False, True, False),
-    'rvgw_loam': (True, True, False),
-    'loam_octr': (False, True, True),
-    'full': (True, True, True),
-}
-
-
 def digest(x):
     return hashlib.sha256(x.detach().cpu().contiguous().view(torch.uint8).numpy().tobytes()).hexdigest()
 
@@ -87,10 +78,8 @@ def pack_layout(prefix, suffix, frames, features, geometry, video_id, end_id):
 
 
 class Backend:
-    def __init__(self, model_path, cards=1, variant='full', local_files_only=True):
-        self.variant=variant
-        self.rvgw,self.loam,self.octr=VARIANTS[variant]
-        self.recent_frames=8 if self.rvgw else 0
+    def __init__(self, model_path, cards=1, local_files_only=True):
+        self.recent_frames=8
         self.last_selection={}
         self.processor = AutoProcessor.from_pretrained(model_path, local_files_only=local_files_only)
         self.model = Qwen3_5ForConditionalGeneration.from_pretrained(
@@ -200,16 +189,11 @@ class Backend:
 
     def select(self, features, geometry, groups):
         n, hidden = features.shape
-        if not self.loam:
-            keep=recent_visual_mask(geometry,self.recent_frames,2).nonzero().flatten()
-            self.last_selection={'variant':self.variant,'LOAM':False,'OCTR':False,
-                'rvgw_groups':len(torch.unique(geometry[keep,0])),'entities':0}
-            return keep
         vp = self.processor.video_token_id
         vs, ve = self.processor.vision_start_token_id, self.processor.vision_end_token_id
         entity = EntityMem(vs, ve, short_term_frames=self.recent_frames, mid_term_frames=256,
                     max_entities=256, tokens_per_entity=32, saliency_quantile=.60,
-                    match_threshold=.72, temporal_burst_selection=self.octr,
+                    match_threshold=.72, temporal_burst_selection=True,
                     temporal_burst_max_events=32, temporal_burst_max_events_per_entity=0,
                     temporal_burst_radius=1, temporal_burst_tokens_per_frame=2)
         entity.save_path = None
@@ -229,7 +213,6 @@ class Backend:
         keep = keep[(keep > 0) & (keep < n+1)] - 1
         keep = keep.sort().values
         self.last_selection=entity.last_records[0]
-        self.last_selection['variant']=self.variant
         recent = recent_visual_mask(geometry, entity.short_term_frames, entity.temporal_patch_size)
         if not torch.isin(recent.nonzero().flatten(), keep).all():
             raise ValueError('Recent visual tokens were lost')
@@ -301,7 +284,6 @@ class Backend:
             telemetry['recent_candidate_visual_tokens'] = int(recent.sum())
             telemetry['recent_kept_visual_tokens'] = int(recent[keep].sum())
             telemetry['kept_old_memory_tokens'] = int((keep < previous).sum())
-            telemetry['components']={'RVGW':self.rvgw,'LOAM':self.loam,'OCTR':self.octr}
             telemetry['selection_record']=self.last_selection
             features, geometry = features[keep], geometry[keep]
             ids, pos4, visual, sorted_features = pack_layout(prefix, suffix, groups, features, geometry,

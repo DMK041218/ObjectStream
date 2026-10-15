@@ -8,9 +8,8 @@ packaged under `models/qwen-vl-utils/src/qwen_vl_utils_objectstream/`.
 Install both local packages with the pinned Transformers 4.50.0 environment.
 
 The public `use_objectstream=True` argument selects the entity-centric
-`EntityMem` path in the modified model. The legacy
-`ovo_ablation_work/models/` import paths resolve their supporting modules
-through the installed packages. `objectstream/entity_memory.py` is a
+`EntityMem` path in the modified model. OVO-Bench inference and scoring are
+under `evaluation/ovobench/`. `objectstream/entity_memory.py` is a
 standalone helper rather than the memory implementation used by the model.
 
 ## Temporal memory

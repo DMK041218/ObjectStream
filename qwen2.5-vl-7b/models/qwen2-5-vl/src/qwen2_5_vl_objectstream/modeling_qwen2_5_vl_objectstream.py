@@ -1171,8 +1171,6 @@ class Qwen2_5_VLModel(Qwen2_5_VLPreTrainedModel):
         entity_query_saliency: Optional[bool] = None,
         entity_query_saliency_mix: Optional[float] = None,
         entity_save_path: Optional[str] = None,
-        entity_frontend: Optional[str] = None,
-        entity_frontend_video_path: Optional[str] = None,
         # If provided, bypass Otsu with a fixed similarity threshold for adjacent pairing
         pair_sim_threshold: Optional[float] = None,
     ) -> Union[Tuple, BaseModelOutputWithPast]:
@@ -1332,10 +1330,6 @@ class Qwen2_5_VLModel(Qwen2_5_VLPreTrainedModel):
                     self.entitymem.query_saliency = bool(entity_query_saliency)
                 if entity_query_saliency_mix is not None:
                     self.entitymem.query_saliency_mix = float(entity_query_saliency_mix)
-                if entity_frontend is not None:
-                    self.entitymem.entity_frontend = str(entity_frontend)
-                if entity_frontend_video_path is not None:
-                    self.entitymem.frontend_video_path = str(entity_frontend_video_path)
                 self.entitymem.save_path = entity_save_path
                 hidden_states, position_embeddings, position_ids, new_attention_mask, objectstream_kept_indices = self.entitymem.process_memory_streaming(
                     hidden_states=hidden_states,
@@ -1985,8 +1979,6 @@ class Qwen2_5_VLForConditionalGeneration(Qwen2_5_VLPreTrainedModel, GenerationMi
         entity_query_saliency: Optional[bool] = None,
         entity_query_saliency_mix: Optional[float] = None,
         entity_save_path: Optional[str] = None,
-        entity_frontend: Optional[str] = None,
-        entity_frontend_video_path: Optional[str] = None,
         # If provided, bypass Otsu with a fixed similarity threshold for adjacent pairing
         pair_sim_threshold: Optional[float] = None,
     ) -> Union[Tuple, Qwen2_5_VLCausalLMOutputWithPast]:
@@ -2217,8 +2209,6 @@ class Qwen2_5_VLForConditionalGeneration(Qwen2_5_VLPreTrainedModel, GenerationMi
             entity_query_saliency=entity_query_saliency,
             entity_query_saliency_mix=entity_query_saliency_mix,
             entity_save_path=entity_save_path,
-            entity_frontend=entity_frontend,
-            entity_frontend_video_path=entity_frontend_video_path,
             pair_sim_threshold=pair_sim_threshold,
         )
 
@@ -2330,8 +2320,6 @@ class Qwen2_5_VLForConditionalGeneration(Qwen2_5_VLPreTrainedModel, GenerationMi
         entity_query_saliency=None,
         entity_query_saliency_mix=None,
         entity_save_path=None,
-        entity_frontend=None,
-        entity_frontend_video_path=None,
 
         **kwargs,
     ):
@@ -2448,10 +2436,6 @@ class Qwen2_5_VLForConditionalGeneration(Qwen2_5_VLPreTrainedModel, GenerationMi
             model_inputs["entity_query_saliency_mix"] = entity_query_saliency_mix
         if entity_save_path is not None:
             model_inputs["entity_save_path"] = entity_save_path
-        if entity_frontend is not None:
-            model_inputs["entity_frontend"] = entity_frontend
-        if entity_frontend_video_path is not None:
-            model_inputs["entity_frontend_video_path"] = entity_frontend_video_path
 
         # Qwen2-5-VL position_ids are prepareed with rope_deltas in forward
         model_inputs["position_ids"] = None
