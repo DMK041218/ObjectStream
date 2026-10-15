@@ -138,3 +138,18 @@ CUDA_VISIBLE_DEVICES=0 python evaluation_latency_generation_microbench.py \
 Report the same maximum generation length for all methods. In addition to
 wall-clock answer time, keep TTFT, decode throughput, generated-token count,
 and truncation rate so faster decoding is not conflated with shorter outputs.
+
+## Optional Video-MME Long task definition
+
+The LMMS-Eval task definition in `scripts/videomme_long.yaml` filters the
+official Video-MME dataset to its long split and reuses the official prompt
+and scoring functions. Install its optional dependencies separately:
+
+```bash
+python -m pip install -r requirements/videomme.txt
+python -m pytest tests/test_videomme_task.py -q
+```
+
+This checks task loading and split filtering without downloading videos.
+The YAML is a task definition, not a standalone ObjectStream inference runner;
+an LMMS-Eval model adapter is still required to run it with ObjectStream.

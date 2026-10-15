@@ -57,11 +57,12 @@ Environment variables supported by the installer:
 python3.11 -m venv .venv
 source .venv/bin/activate
 
-python -m pip install --upgrade pip setuptools wheel
+python -m pip install pip==26.2.1 setuptools==75.8.2 wheel==0.45.1
 python -m pip install \
   --index-url https://download.pytorch.org/whl/cu124 \
   torch==2.6.0 torchvision==0.21.0
 python -m pip install -r requirements/runtime.txt
+python scripts/repair_decord_wheel.py
 python -m pip install -e models/qwen-vl-utils
 python -m pip install -e models/qwen2-5-vl
 python -m pip install -e .
@@ -132,6 +133,10 @@ python scripts/run_qwen25vl_objectstream.py \
 ```
 
 ## 7. Troubleshooting
+
+The installer normalizes Decord 0.6's legacy Linux wheel tag to match the
+official wheel filename, updating its RECORD checksum as well. Decoder code
+and binaries are unchanged; this allows current pip compatibility checks.
 
 ### `flash_attn` import or build failure
 

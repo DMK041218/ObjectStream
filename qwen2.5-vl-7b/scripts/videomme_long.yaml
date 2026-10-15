@@ -6,9 +6,9 @@ dataset_kwargs:
 task: videomme_long
 test_split: test
 output_type: generate_until
-process_docs: !function utils_long.videomme_long_process_docs
-doc_to_visual: !function utils_long.videomme_doc_to_visual
-doc_to_text: !function utils_long.videomme_doc_to_text
+process_docs: !function videomme_long_utils.videomme_long_process_docs
+doc_to_visual: !function videomme_long_utils.videomme_doc_to_visual
+doc_to_text: !function videomme_long_utils.videomme_doc_to_text
 doc_to_target: "answer"
 generation_kwargs:
   max_new_tokens: 16
@@ -16,10 +16,10 @@ generation_kwargs:
   top_p: 1.0
   num_beams: 1
   do_sample: false
-process_results: !function utils_long.videomme_process_results
+process_results: !function videomme_long_utils.videomme_process_results
 metric_list:
   - metric: videomme_perception_score
-    aggregation: !function utils_long.videomme_aggregate_results
+    aggregation: !function videomme_long_utils.videomme_aggregate_results
     higher_is_better: true
 lmms_eval_specific_kwargs:
   default:

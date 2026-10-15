@@ -1351,6 +1351,10 @@ class Qwen2_5_VLModel(Qwen2_5_VLPreTrainedModel):
                     video_grid_thw=video_grid_thw,
                     pair_distance_threshold=(1.0 - float(pair_sim_threshold)) if pair_sim_threshold is not None else None,
                 )
+            # Keep the compressed padding mask for subsequent generation steps.
+            # HF's token stream/cache_position still indexes the original prompt;
+            # those positions must not replace multimodal RoPE coordinates.
+            objectstream_attention_mask = new_attention_mask
             # flatten/varlen: 保持 cu_seqlens (int32)
             if attention_mask is not None and attention_mask.dim() == 1 and new_attention_mask is not None:
                 new_attention_mask = _to_cu_seqlens(new_attention_mask)
@@ -1358,8 +1362,11 @@ class Qwen2_5_VLModel(Qwen2_5_VLPreTrainedModel):
             # 不使用memory/drop，保持原attention_mask
             new_attention_mask = attention_mask
 
-        # 依据memory/drop之后的序列长度重建cache_position，并构造与之匹配的causal_mask
-        if cache_position is None:
+        # Decoder cache slots are dense after compression. GenerationMixin's
+        # cache_position, by contrast, indexes the original output token stream
+        # and is also used by the outer model to continue semantic RoPE positions.
+        # Rebase only the decoder-local cache positions, including decode steps.
+        if cache_position is None or use_objectstream_effective or use_entitymem_effective:
             past_seen_tokens = past_key_values.get_seq_length() if past_key_values is not None else 0
             cache_position = torch.arange(
                 past_seen_tokens, past_seen_tokens + hidden_states.shape[1], device=hidden_states.device
@@ -1428,6 +1435,7 @@ class Qwen2_5_VLModel(Qwen2_5_VLPreTrainedModel):
         )
         if 'objectstream_kept_indices' in locals():
             out.objectstream_kept_indices = objectstream_kept_indices
+            out.objectstream_attention_mask = objectstream_attention_mask
         return out
 
     def _update_causal_mask(
@@ -1620,6 +1628,7 @@ class Qwen2_5_VLCausalLMOutputWithPast(ModelOutput):
     hidden_states: Optional[Tuple[torch.FloatTensor]] = None
     attentions: Optional[Tuple[torch.FloatTensor]] = None
     rope_deltas: Optional[torch.LongTensor] = None
+    objectstream_attention_mask: Optional[torch.Tensor] = None
 
 
 QWEN2_5_VL_INPUTS_DOCSTRING = r"""
@@ -2257,6 +2266,22 @@ class Qwen2_5_VLForConditionalGeneration(Qwen2_5_VLPreTrainedModel, GenerationMi
             hidden_states=outputs.hidden_states,
             attentions=outputs.attentions,
             rope_deltas=self.rope_deltas,
+            objectstream_attention_mask=getattr(outputs, "objectstream_attention_mask", None),
+        )
+
+    def _update_model_kwargs_for_generation(
+        self, outputs, model_kwargs, is_encoder_decoder=False, num_new_tokens=1
+    ):
+        compressed_mask = getattr(outputs, "objectstream_attention_mask", None)
+        if compressed_mask is not None and outputs.past_key_values is not None:
+            # The parent appends the new decode token to this compressed prefix.
+            # Do not rebase GenerationMixin's cache_position: it must continue
+            # to slice generated input_ids and preserve the original RoPE offset.
+            model_kwargs = dict(model_kwargs)
+            model_kwargs["attention_mask"] = compressed_mask
+        return super()._update_model_kwargs_for_generation(
+            outputs, model_kwargs, is_encoder_decoder=is_encoder_decoder,
+            num_new_tokens=num_new_tokens,
         )
 
     def prepare_inputs_for_generation(

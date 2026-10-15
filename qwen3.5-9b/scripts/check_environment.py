@@ -4,6 +4,7 @@ import importlib
 from pathlib import Path
 import platform
 import sys
+import subprocess
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
@@ -27,6 +28,7 @@ def main():
     require("objectstream.backends.qwen35.backend")
     if not hasattr(transformers, "Qwen3_5ForConditionalGeneration"):
         raise SystemExit("[FAIL] missing native Qwen3.5 implementation")
+    subprocess.run([sys.executable, "-m", "pip", "check"], check=True)
     print(f"[OK] Python: {platform.python_version()}")
     print(f"[OK] PyTorch: {torch.__version__}")
     print(f"[OK] Transformers: {transformers.__version__}")

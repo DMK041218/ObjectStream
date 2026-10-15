@@ -1,5 +1,7 @@
 -r runtime.txt
-datasets==2.16.1
+datasets==2.21.0
+pyarrow==19.0.1
+chardet==5.2.0
 evaluate==0.4.3
 jsonlines==4.0.0
 loguru==0.7.3

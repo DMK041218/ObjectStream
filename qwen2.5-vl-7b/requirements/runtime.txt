@@ -17,3 +17,6 @@ tokenizers==0.21.1
 torchcodec==0.2
 transformers==4.50.0
 triton==3.2.0; platform_system == "Linux"
+pip==26.2.1
+setuptools==75.8.2
+wheel==0.45.1

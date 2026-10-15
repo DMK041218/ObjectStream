@@ -4,6 +4,7 @@ from __future__ import annotations
 import importlib
 import platform
 import sys
+import subprocess
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -40,6 +41,7 @@ def main() -> None:
     if transformers.__version__ != expected:
         raise SystemExit(f'[FAIL] Qwen2.5-VL requires transformers=={expected}; use its separate environment')
 
+    subprocess.run([sys.executable, "-m", "pip", "check"], check=True)
     print(f"[OK] Python: {platform.python_version()}")
     print(f"[OK] PyTorch: {torch.__version__}")
     print(f"[OK] Transformers: {transformers.__version__}")

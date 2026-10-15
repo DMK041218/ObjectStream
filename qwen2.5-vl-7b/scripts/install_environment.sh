@@ -13,11 +13,12 @@ INSTALL_FLASH_ATTN="${INSTALL_FLASH_ATTN:-1}"
 # shellcheck disable=SC1091
 source "${VENV_DIR}/bin/activate"
 
-python -m pip install --upgrade pip setuptools wheel
+python -m pip install pip==26.2.1 setuptools==75.8.2 wheel==0.45.1
 python -m pip install \
   --index-url "${TORCH_INDEX_URL}" \
   torch==2.6.0 torchvision==0.21.0
 python -m pip install -r requirements/runtime.txt
+python scripts/repair_decord_wheel.py
 python -m pip install -e models/qwen-vl-utils
 python -m pip install -e models/qwen2-5-vl
 python -m pip install -e .

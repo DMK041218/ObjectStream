@@ -20,10 +20,11 @@ The installer accepts `PYTHON_BIN`, `VENV_DIR` (default `.venv`), and
 ```bash
 python3.12 -m venv .venv
 source .venv/bin/activate
-python -m pip install --upgrade pip setuptools wheel
+python -m pip install pip==26.2.1 setuptools==75.8.2 wheel==0.45.1
 python -m pip install --index-url https://download.pytorch.org/whl/cu124 \
   torch==2.6.0 torchvision==0.21.0
 python -m pip install -r requirements/runtime.txt
+python scripts/repair_decord_wheel.py
 python -m pip install -e .
 python scripts/check_environment.py
 python -m pytest tests -q
@@ -31,6 +32,8 @@ python -m pytest tests -q
 
 The native model runs with BF16 and SDPA. FlashAttention and custom
 linear-attention kernels are optional; PyTorch fallback kernels are supported.
+The installer corrects Decord 0.6's legacy Linux wheel tag and RECORD checksum
+to match the official wheel filename; decoder code and binaries are unchanged.
 Model weights are loaded from a standard Qwen3.5-9B checkpoint, with no
 ObjectStream-specific weight conversion or fine-tuning.
 
