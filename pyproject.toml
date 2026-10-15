@@ -1,9 +1,9 @@
 [project]
 name = "objectstream"
-version = "0.1.0"
+version = "0.2.0"
 description = "Training-free object-centric visual memory for streaming Video-LLMs"
 readme = "README.md"
-requires-python = ">=3.10,<3.12"
+requires-python = ">=3.10,<3.13"
 dependencies = [
     "numpy==1.26.4",
     "torch==2.6.0",

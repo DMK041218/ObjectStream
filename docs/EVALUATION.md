@@ -1,5 +1,34 @@
 # Evaluation Guide
 
+This page describes Qwen2.5. For the separate native Qwen3.5-9B environment,
+chronological manifests and scoring, see [Qwen3.5](QWEN35.md).
+
+## Archived e64/t8/burst profile (Qwen2.5)
+
+The archived launcher used recent8, medium64, entity64/token8,
+saliency.60, match.72, burst32/radius1/token2,1fps, max256 frames,
+max401408 pixels and time_window_size256. Minimal README/demo defaults differ.
+For real-time perception only, explicitly select the six tasks:
+
+```bash
+CUDA_VISIBLE_DEVICES=0 python ovo_ablation_work/evaluation/ovobench.py \
+  --ckpt_path /path/to/Qwen2.5-VL-7B-Instruct \
+  --task_json /path/to/OVO-Bench/ovo_bench_new.json --video_dir /path/to/OVO-Bench \
+  --result_dir outputs/ovo_qwen25_e64_t8_burst \
+  --task STU OJR ATR ACR OCR FPD --fps 1 --max_pixels 401408 --max_frames 256 \
+  --time_window_size 256 --use_entitymem --short_frames 8 --medium_frames 64 \
+  --entity_max_entities 64 --entity_tokens_per_entity 8 --entity_saliency_quantile 0.60 \
+  --entity_match_threshold 0.72 --entity_temporal_burst_selection \
+  --entity_temporal_burst_max_events 32 --entity_temporal_burst_radius 1 \
+  --entity_temporal_burst_tokens_per_frame 2
+```
+
+The original evaluator expects the benchmark's `chunked_videos` layout under
+`--video_dir`; `src_videos` alone is not a substitute for those prepared clips.
+This publishes the archived profile, not a claim of a fresh73.3 rerun after
+the packaging fix. The evaluator uses FlashAttention2; eager demo execution
+is an installation check, not the identical speed/reproduction configuration.
+
 Install the evaluation dependencies before running benchmarks:
 
 ```bash

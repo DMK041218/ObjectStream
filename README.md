@@ -1,5 +1,29 @@
 # ObjectStream
 
+## Two supported backbones
+
+| Version | Setup | Inference | Runtime |
+|---|---|---|---|
+| Qwen2.5-VL-7B | `bash scripts/install_environment.sh` | `scripts/run_qwen25vl_objectstream.py` | Python3.11 / Transformers4.50.0 |
+| Qwen3.5-9B | `bash scripts/install_qwen35_environment.sh` | `scripts/run_qwen35_objectstream.py` | Python3.12 / Transformers5.18.0 |
+
+**Use separate environments.** The Qwen3.5 native decoder is not compatible
+with the pinned Qwen2.5 patched-model environment. See the
+[Qwen3.5 guide](docs/QWEN35.md) for streaming manifests and evaluation.
+
+For [issue#1](https://github.com/DMK041218/ObjectStream/issues/1): update from
+the old `4ad60cc` snapshot and install BOTH local packages. The processor,
+configuration, memory helpers, video utilities and legacy relative-import
+compatibility modules are now in the repository. Do not silently substitute
+the public `qwen_vl_utils` package. See [the fix and import tests](docs/ISSUE_1.md).
+
+The fixed Qwen3.5 default is the validated recent8/entity256/token32 profile,
+**not** the in-progress17.5%-retention experiment. Memory behavior differs:
+Qwen2.5 rebuilds memory within each supplied video prefix; Qwen3.5 also carries
+compressed visual features between chronological calls. See [scope and provenance](docs/SOURCE_PROVENANCE.md).
+
+The remaining installation/quick-start sections below describe **Qwen2.5**.
+
 ObjectStream is a **training-free, object-centric visual memory** for streaming
 video understanding with Qwen2.5-VL. It groups visual tokens into persistent
 objects, updates object states over time, and retains compact evidence around
@@ -143,7 +167,7 @@ tests exercise the standalone object-memory component.
 
 ## Notes
 
-- The released implementation targets **Qwen2.5-VL**.
+- Both **Qwen2.5-VL-7B** and **Qwen3.5-9B** are provided with separate environments.
 - ObjectStream changes inference-time visual-memory construction only; model
   parameters are not updated.
 - Model checkpoints and benchmark datasets are not stored in this repository.

@@ -9,6 +9,7 @@ numpy==1.26.4
 opencv-python-headless==4.11.0.86
 packaging==24.2
 pillow==11.1.0
+pytest==8.3.5
 requests==2.32.3
 safetensors==0.5.3
 sentencepiece==0.2.0

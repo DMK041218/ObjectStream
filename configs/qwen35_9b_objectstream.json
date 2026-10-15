@@ -1,0 +1,13 @@
+{
+  "model_path": "Qwen/Qwen3.5-9B",
+  "attention": "sdpa",
+  "dtype": "bfloat16",
+  "thinking": false,
+  "generation": {"max_new_tokens": 128, "do_sample": false, "seed": 1234},
+  "sampling": {"fps": 1, "max_frames_per_update": 256, "anchor_end": true},
+  "memory": {"recent_frames": 8, "medium_frames": 256, "max_entities": 256,
+    "tokens_per_entity": 32, "saliency_quantile": 0.6, "match_threshold": 0.72,
+    "temporal_burst_selection": true, "temporal_burst_max_events": 32,
+    "temporal_burst_radius": 1, "temporal_burst_tokens_per_frame": 2},
+  "note": "Describes the fixed full default, not a config-file loader. CLI variant=full. Not17.5% experimental."
+}

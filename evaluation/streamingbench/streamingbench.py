@@ -23,15 +23,8 @@ import pandas as pd
 import torch
 from tqdm import tqdm
 
-try:
-    from qwen_vl_utils_objectstream import process_vision_info
-except ModuleNotFoundError:
-    from qwen_vl_utils import process_vision_info
-try:
-    from qwen2_5_vl_objectstream import Qwen2_5_VLForConditionalGeneration, Qwen2_5_VLProcessor
-except Exception:
-    Qwen2_5_VLForConditionalGeneration = None
-    Qwen2_5_VLProcessor = None
+from qwen_vl_utils_objectstream import process_vision_info
+from qwen2_5_vl_objectstream import Qwen2_5_VLForConditionalGeneration, Qwen2_5_VLProcessor
 class StreamingBenchEvaluator:
     """Evaluator for StreamingBench using Qwen2.5-VL-ObjectStream."""
 
