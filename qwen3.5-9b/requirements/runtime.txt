@@ -1,0 +1,12 @@
+# Qwen3.5: Python 3.12 / Transformers 5.18.0; use a separate environment.
+# PyTorch 2.6.0 / torchvision 0.21.0 CUDA 12.4 are installed by the installer.
+transformers==5.18.0
+tokenizers==0.23.1
+huggingface-hub==1.31.0
+safetensors==0.8.0
+accelerate==1.11.0
+numpy==1.26.4
+Pillow==11.1.0
+decord==0.6.0
+av==14.2.0
+pytest==8.3.5
