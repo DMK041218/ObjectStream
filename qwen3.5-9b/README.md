@@ -1,5 +1,7 @@
 # ObjectStream · Qwen3.5-9B
 
+[📄 Paper](https://arxiv.org/abs/2607.28312) · [Project overview](../README.md)
+
 Training-free object-centric visual memory for Qwen3.5-9B, using its native
 visual encoder, processor, and hybrid decoder. This directory provides an
 independent implementation and does not require the Qwen2.5-VL packages.

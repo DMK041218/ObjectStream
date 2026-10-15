@@ -1,5 +1,7 @@
 # ObjectStream · Qwen2.5-VL-7B
 
+[📄 Paper](https://arxiv.org/abs/2607.28312) · [Project overview](../README.md)
+
 Training-free object-centric visual memory for Qwen2.5-VL-7B. This directory
 contains the modified model, processor, video utilities, inference runner, and
 OVO-Bench / StreamingBench evaluation scripts.

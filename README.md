@@ -1,5 +1,10 @@
 # ObjectStream
 
+[![Paper](https://img.shields.io/badge/Paper-arXiv%3A2607.28312-b31b1b.svg)](https://arxiv.org/abs/2607.28312)
+
+Official implementation of
+[**ObjectStream: Latent Objects as Memory Anchors for Streaming Video Understanding**](https://arxiv.org/abs/2607.28312).
+
 ObjectStream is a training-free, object-centric visual memory framework for
 streaming video understanding. It compresses historical visual tokens into
 object-level representations while retaining recent observations and temporal
